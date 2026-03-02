@@ -58,13 +58,13 @@ export class SimpleAppStack extends cdk.Stack {
         parameters: {
           RequestItems: {
             [moviesTable.tableName]: generateBatch(movies),
-            [movieCastsTable.tableName]: generateBatch(movieCasts),  // Added
+            [movieCastsTable.tableName]: generateBatch(movieCasts), 
           },
         },
-        physicalResourceId: custom.PhysicalResourceId.of("moviesddbInitData"), //.of(Date.now().toString()),
+        physicalResourceId: custom.PhysicalResourceId.of("moviesddbInitData"), 
       },
       policy: custom.AwsCustomResourcePolicy.fromSdkCalls({
-        resources: [moviesTable.tableArn, movieCastsTable.tableArn],  // Includes movie cast
+        resources: [moviesTable.tableArn, movieCastsTable.tableArn],  
       }),
     });
 
@@ -93,7 +93,7 @@ export class SimpleAppStack extends cdk.Stack {
       },
     });
 
-    moviesTable.grantReadData(getMovieByIdFn)
+    
 
     new cdk.CfnOutput(this, "Get Movie Function Url", { value: getMovieByIdURL.url });
 
@@ -113,6 +113,8 @@ export class SimpleAppStack extends cdk.Stack {
       }
     );
 
+    moviesTable.grantReadData(getAllMoviesFn);
+
     const getAllMoviesURL = getAllMoviesFn.addFunctionUrl({
       authType: lambda.FunctionUrlAuthType.NONE,
       cors: {
@@ -120,8 +122,8 @@ export class SimpleAppStack extends cdk.Stack {
       },
     });
 
-    // Give read permission to DynamoDB
-    moviesTable.grantReadData(getAllMoviesFn);
+    
+   
 
     new cdk.CfnOutput(this, "Get All Movies Function Url", {
       value: getAllMoviesURL.url,
@@ -139,6 +141,7 @@ export class SimpleAppStack extends cdk.Stack {
         memorySize: 128,
         environment: {
           CAST_TABLE_NAME: movieCastsTable.tableName,
+          MOVIES_TABLE_NAME: moviesTable.tableName,
           REGION: "eu-west-1",
         },
       }
@@ -152,7 +155,7 @@ export class SimpleAppStack extends cdk.Stack {
     });
 
     movieCastsTable.grantReadData(getMovieCastMembersFn);
-
+  
     new cdk.CfnOutput(this, "Get Movie Cast Url", {
       value: getMovieCastMembersURL.url,
     });
